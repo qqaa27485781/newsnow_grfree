@@ -13,28 +13,29 @@ function ThemeToggle() {
 }
 
 export function Menu() {
-  const { loggedIn, login, logout, userInfo, enableLogin } = useLogin()
-  const [shown, show] = useState(false)
+  const { enableLogin, loggedIn, login, logout } = useLogin()
+  const [shown, setShown] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setShown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [ref])
+
   return (
-    <span className="relative" onMouseEnter={() => show(true)} onMouseLeave={() => show(false)}>
-      <span className="flex items-center scale-90">
-        {
-          enableLogin && loggedIn && userInfo.avatar
-            ? (
-                <button
-                  type="button"
-                  className="h-6 w-6 rounded-full bg-cover"
-                  style={
-                    {
-                      backgroundImage: `url(${userInfo.avatar}&s=24)`,
-                    }
-                  }
-                >
-                </button>
-              )
-            : <button type="button" className="btn i-si:more-muted-horiz-circle-duotone" />
-        }
-      </span>
+    <span ref={ref}>
+      <button
+        type="button"
+        className="btn i-ph:dots-three-vertical-duotone"
+        onClick={() => setShown(!shown)}
+      />
       {shown && (
         <div className="absolute right-0 z-99 bg-transparent pt-4 top-4">
           <motion.div
@@ -65,28 +66,6 @@ export function Menu() {
                     </li>
                   ))}
               <ThemeToggle />
-              <li onClick={() => window.open(Homepage)} className="cursor-pointer [&_*]:cursor-pointer transition-all">
-                <span className="i-ph:github-logo-duotone inline-block" />
-                <span>Star on Github </span>
-              </li>
-              <li className="flex gap-2 items-center">
-                <a
-                  href="https://github.com/ourongxing/newsnow"
-                >
-                  <img
-                    alt="GitHub stars badge"
-                    src="https://img.shields.io/github/stars/ourongxing/newsnow?logo=github"
-                  />
-                </a>
-                <a
-                  href="https://github.com/ourongxing/newsnow/fork"
-                >
-                  <img
-                    alt="GitHub forks badge"
-                    src="https://img.shields.io/github/forks/ourongxing/newsnow?logo=github"
-                  />
-                </a>
-              </li>
             </ol>
           </motion.div>
         </div>
